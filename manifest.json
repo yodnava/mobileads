@@ -1,6 +1,6 @@
 {
   "name": "YODNAVA Mobile ADS",
-  "short_name": "YNV_MiniAds",
+  "short_name": "Mobile MiniAds",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#000000",
@@ -8,7 +8,7 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "default.jpg",
+      "src": "default.png",
       "sizes": "512x512",
       "type": "image/jpeg"
     }
