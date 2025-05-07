@@ -122,6 +122,16 @@
       }, duration);
     };
 
+    const exitFullscreen = () => {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    };
+
     const stopSlideshow = () => {
       clearInterval(timer);
       slideshow.innerHTML = '';
@@ -131,6 +141,7 @@
       current = 0;
       freeze = false;
       isRunning = false;
+      exitFullscreen();  // << ออกจาก fullscreen
     };
 
     const toggleFreeze = () => {
@@ -181,16 +192,16 @@
     window.addEventListener('click', () => {
       const now = Date.now();
       if (now - lastTap < 300) {
-        stopSlideshow();
+        stopSlideshow(); // แตะ 2 ครั้ง = ออก slideshow
       } else {
-        toggleFreeze();
+        toggleFreeze();  // แตะ 1 ครั้ง = freeze
       }
       lastTap = now;
     });
 
     playBtn.addEventListener('click', async () => {
       await loadImages();
-      enterFullscreen();
+      enterFullscreen();   // เข้า fullscreen ตอนเริ่ม
       startSlideshow();
     });
   </script>
