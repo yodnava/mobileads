@@ -1,1 +1,54 @@
-["0.jpg", "1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpg"]
+[
+  {
+    "file": "00.jpg",
+    "duration": 5
+  },
+  {
+    "file": "01.jpg",
+    "duration": 5
+  },
+  {
+    "file": "02.jpg",
+    "duration": 5
+  },
+  {
+    "file": "03.jpg",
+    "duration": 5
+  },
+  {
+    "file": "04.jpg",
+    "duration": 7
+  },
+  {
+    "file": "05.jpg",
+    "duration": 5
+  },
+  {
+    "file": "06.jpg",
+    "duration": 5
+  },
+  {
+    "file": "07.jpg",
+    "duration": 5
+  },
+  {
+    "file": "08.jpg",
+    "duration": 7
+  },
+  {
+    "file": "09.jpg",
+    "duration": 5
+  },
+  {
+    "file": "10.jpg",
+    "duration": 5
+  },
+  {
+    "file": "11.jpg",
+    "duration": 5
+  },
+  {
+    "file": "12.jpg",
+    "duration": 7
+  }
+]
