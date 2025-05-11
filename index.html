@@ -6,7 +6,7 @@
     <title>YODNAVA Mobile ADS</title>
     <meta name="theme-color" content="#000000" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="default.png" />
+    <link rel="apple-touch-icon" href="default.jpg" />
     <script>
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js');
@@ -38,7 +38,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-image: url('default.png');
+        background-image: url('default.jpg');
         background-size: cover;
         background-position: center;
       }
@@ -89,18 +89,19 @@
       let autoResumeTimer = null;
       let isRunning = false;
   
-      const loadImages = async () => {
-        const files = await fetch('assets/index.json')
-          .then(res => res.json())
-          .catch(() => []);
-        images = files.sort();
-        for (const src of images) {
-          const img = new Image();
-          img.src = 'assets/' + src + '?v=' + Date.now();
-          img.classList.add('slide-image');
-          slideshow.appendChild(img);
-        }
-      };
+      
+const loadImages = async () => {
+  const data = await fetch('assets/index.json')
+    .then(res => res.json())
+    .catch(() => []);
+  images = data;
+  for (const entry of images) {
+    const img = new Image();
+    img.src = 'assets/' + entry.file + '?v=' + Date.now();
+    img.classList.add('slide-image');
+    slideshow.appendChild(img);
+  }
+};
   
       const showImage = (index) => {
         [...slideshow.children].forEach((img, i) => {
@@ -108,27 +109,30 @@
         });
       };
   
-      const startSlideshow = () => {
-        if (isRunning) return;
-        isRunning = true;
-        slideshow.style.display = 'block';
-        defaultBg.style.display = 'none';
-        topbar.style.display = 'none';
-        showImage(current);
-        const duration = parseInt(intervalInput.value) * 1000;
-        timer = setInterval(() => {
-          current = (current + 1) % images.length;
-          showImage(current);
-        }, duration);
-      };
+      
+const startSlideshow = () => {
+  if (isRunning) return;
+  isRunning = true;
+  slideshow.style.display = 'block';
+  defaultBg.style.display = 'none';
+  topbar.style.display = 'none';
+  showImage(current);
+  scheduleNext();
+};
+
+const scheduleNext = () => {
+  const duration = (images[current]?.duration || 5) * 1000;
+  timer = setTimeout(() => {
+    current = (current + 1) % images.length;
+    showImage(current);
+    if (!freeze) scheduleNext();
+  }, duration);
+};
   
-      const resumeSlideshow = () => {
-        const duration = parseInt(intervalInput.value) * 1000;
-        timer = setInterval(() => {
-          current = (current + 1) % images.length;
-          showImage(current);
-        }, duration);
-      };
+      
+const resumeSlideshow = () => {
+  scheduleNext();
+};
   
       const exitFullscreen = () => {
         if (document.exitFullscreen) {
@@ -140,17 +144,18 @@
         }
       };
   
-      const stopSlideshow = () => {
-        clearInterval(timer);
-        slideshow.innerHTML = '';
-        slideshow.style.display = 'none';
-        topbar.style.display = 'flex';
-        defaultBg.style.display = 'block';
-        current = 0;
-        freeze = false;
-        isRunning = false;
-        exitFullscreen();
-      };
+      
+const stopSlideshow = () => {
+  clearTimeout(timer);
+  slideshow.innerHTML = '';
+  slideshow.style.display = 'none';
+  topbar.style.display = 'flex';
+  defaultBg.style.display = 'block';
+  current = 0;
+  freeze = false;
+  isRunning = false;
+  exitFullscreen();
+};
   
       const toggleFreeze = () => {
         if (!isRunning) return;
