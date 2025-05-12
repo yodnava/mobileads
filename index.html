@@ -1,221 +1,241 @@
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YODNAVA Mobile ADS</title>
-    <meta name="theme-color" content="#000000" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="default.jpg" />
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js');
-      }
-    </script>
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        font-family: sans-serif;
-        background: #000;
-      }
-      #topbar {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 10px;
-        color: white;
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        z-index: 10;
-      }
-      #default-bg {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-image: url('default.jpg');
-        background-size: cover;
-        background-position: center;
-      }
-      #slideshow {
-        display: none;
-        height: 100%;
-        width: 100%;
-        position: absolute;
-        top: 0;
-        left: 0;
-        overflow: hidden;
-        background-color: black;
-      }
-      .slide-image {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        background-color: black;
-        opacity: 0;
-        transition: opacity 2s;
-      }
-      .visible {
-        opacity: 1;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="topbar">
-      <button id="playBtn">Play</button>
-    </div>
-    <div id="default-bg"></div>
-    <div id="slideshow"></div>
-  
-    <script>
-      const playBtn = document.getElementById('playBtn');
-      const topbar = document.getElementById('topbar');
-      const defaultBg = document.getElementById('default-bg');
-      const slideshow = document.getElementById('slideshow');
-  
-      let images = [];
-      let current = 0;
-      let timer = null;
-      let freeze = false;
-      let lastTap = 0;
-      let autoResumeTimer = null;
-      let isRunning = false;
-  
-      
-const loadImages = async () => {
-  const data = await fetch('assets/index.json')
-    .then(res => res.json())
-    .catch(() => []);
-  images = data;
-  for (const entry of images) {
-    const img = new Image();
-    img.src = 'assets/' + entry.file + '?v=' + Date.now();
-    img.classList.add('slide-image');
-    slideshow.appendChild(img);
-  }
-};
-  
-      const showImage = (index) => {
-        [...slideshow.children].forEach((img, i) => {
-          img.classList.toggle('visible', i === index);
-        });
-      };
-  
-      
-const startSlideshow = () => {
-  if (isRunning) return;
-  isRunning = true;
-  slideshow.style.display = 'block';
-  defaultBg.style.display = 'none';
-  topbar.style.display = 'none';
-  showImage(current);
-  scheduleNext();
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YODNAVA Mobile ADS</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="default.png" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: sans-serif;
+      background: #000;
+    }
+    #topbar {
+      flex-wrap: wrap;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      color: white;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      z-index: 10;
+    }
+    #default-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('default.png');
+      background-size: contain;
+  background-repeat: no-repeat;
+  background-color: black;
+      background-position: center;
+    }
+    #slideshow {
+      display: none;
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      overflow: hidden;
+      background-color: black;
+    }
+    .slide-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: black;
+      opacity: 0;
+      transition: opacity 2s;
+    }
+    .visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <label><input type="checkbox" value="prd1" /> PRD1</label>
+    <label><input type="checkbox" value="prd2" /> PRD2</label>
+    <label><input type="checkbox" value="prd3" /> PRD3</label>
+    <label><input type="checkbox" value="prd4" /> PRD4</label>
+    <label><input type="checkbox" value="prd5" /> PRD5</label>
+    <label><input type="checkbox" value="prd6" /> PRD6</label>
+    <label><input type="checkbox" value="prd7" /> PRD7</label>
+    <label><input type="checkbox" value="prd8" /> PRD8</label>
+    <label><input type="checkbox" value="prd9" /> PRD9</label>
+    <button id="playBtn">Play</button>
+  </div>
+  <div id="default-bg"></div>
+  <div id="slideshow"></div>
 
-const scheduleNext = () => {
-  const duration = (images[current]?.duration || 5) * 1000;
-  timer = setTimeout(() => {
-    current = (current + 1) % images.length;
-    showImage(current);
-    if (!freeze) scheduleNext();
-  }, duration);
-};
-  
-      
-const resumeSlideshow = () => {
-  scheduleNext();
-};
-  
-      const exitFullscreen = () => {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.webkitExitFullscreen) {
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) {
-          document.msExitFullscreen();
-        }
-      };
-  
-      
-const stopSlideshow = () => {
-  clearTimeout(timer);
-  slideshow.innerHTML = '';
-  slideshow.style.display = 'none';
-  topbar.style.display = 'flex';
-  defaultBg.style.display = 'block';
-  current = 0;
-  freeze = false;
-  isRunning = false;
-  exitFullscreen();
-};
-  
-      const toggleFreeze = () => {
-        if (!isRunning) return;
-        if (freeze) {
-          freeze = false;
-          resumeSlideshow();
-        } else {
-          freeze = true;
-          clearInterval(timer);
-          clearTimeout(autoResumeTimer);
-          autoResumeTimer = setTimeout(() => {
-            if (freeze) {
-              freeze = false;
-              resumeSlideshow();
-            }
-          }, 10000);
-        }
-      };
-  
-      const enterFullscreen = () => {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-          elem.msRequestFullscreen();
-        }
-      };
-  
-      let touchStartX = null;
-      window.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX;
+  <script>
+    const playBtn = document.getElementById('playBtn');
+    const topbar = document.getElementById('topbar');
+    const defaultBg = document.getElementById('default-bg');
+    const slideshow = document.getElementById('slideshow');
+
+    let images = [];
+    let current = 0;
+    let timer = null;
+    let freeze = false;
+    let lastTap = 0;
+    let autoResumeTimer = null;
+    let isRunning = false;
+
+    async function fetchPlaylist(folder) {
+      const res = await fetch(folder + "/index.json").then(r => r.json()).catch(() => []);
+      return res.map(item => ({ ...item, folder }));
+    }
+
+    const loadImages = async () => {
+      const selected = ["main"];
+      document.querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
+        selected.push(cb.value);
       });
-  
-      window.addEventListener('touchend', (e) => {
-        if (touchStartX === null) return;
-        const dx = e.changedTouches[0].screenX - touchStartX;
-        if (Math.abs(dx) > 50) {
-          clearInterval(timer);
-          current = dx > 0 ? (current - 1 + images.length) % images.length : (current + 1) % images.length;
-          showImage(current);
-          if (!freeze) resumeSlideshow();
-        }
+
+      images = [];
+      for (const folder of selected) {
+        const data = await fetchPlaylist(folder);
+        images = images.concat(data);
+      }
+
+      for (const entry of images) {
+        const img = new Image();
+        img.src = `${entry.folder}/${entry.file}?v=${Date.now()}`;
+        img.classList.add('slide-image');
+        slideshow.appendChild(img);
+      }
+    };
+
+    const showImage = (index) => {
+      [...slideshow.children].forEach((img, i) => {
+        img.classList.toggle('visible', i === index);
       });
-  
-      window.addEventListener('click', () => {
-        const now = Date.now();
-        if (now - lastTap < 300) {
-          stopSlideshow();
-        } else {
-          toggleFreeze();
-        }
-        lastTap = now;
-      });
-  
-      playBtn.addEventListener('click', async () => {
-        await loadImages();
-        enterFullscreen();
-        startSlideshow();
-      });
-    </script>
-  </body>
-  </html>
-  
+    };
+
+    const startSlideshow = () => {
+      if (isRunning) return;
+      isRunning = true;
+      slideshow.style.display = 'block';
+      defaultBg.style.display = 'none';
+      topbar.style.display = 'none';
+      showImage(current);
+      scheduleNext();
+    };
+
+    const scheduleNext = () => {
+      const duration = (images[current]?.duration || 5) * 1000;
+      timer = setTimeout(() => {
+        current = (current + 1) % images.length;
+        showImage(current);
+        if (!freeze) scheduleNext();
+      }, duration);
+    };
+
+    const resumeSlideshow = () => {
+      scheduleNext();
+    };
+
+    const stopSlideshow = () => {
+      clearTimeout(timer);
+      slideshow.innerHTML = '';
+      slideshow.style.display = 'none';
+      topbar.style.display = 'flex';
+      defaultBg.style.display = 'block';
+      current = 0;
+      freeze = false;
+      isRunning = false;
+      exitFullscreen();
+    };
+
+    const toggleFreeze = () => {
+      if (!isRunning) return;
+      if (freeze) {
+        freeze = false;
+        resumeSlideshow();
+      } else {
+        freeze = true;
+        clearInterval(timer);
+        clearTimeout(autoResumeTimer);
+        autoResumeTimer = setTimeout(() => {
+          if (freeze) {
+            freeze = false;
+            resumeSlideshow();
+          }
+        }, 10000);
+      }
+    };
+
+    const enterFullscreen = () => {
+      const elem = document.documentElement;
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    };
+
+    const exitFullscreen = () => {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    };
+
+    let touchStartX = null;
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+
+    window.addEventListener('touchend', (e) => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(dx) > 50) {
+        clearInterval(timer);
+        current = dx > 0 ? (current - 1 + images.length) % images.length : (current + 1) % images.length;
+        showImage(current);
+        if (!freeze) resumeSlideshow();
+      }
+    });
+
+    window.addEventListener('click', () => {
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        stopSlideshow();
+      } else {
+        toggleFreeze();
+      }
+      lastTap = now;
+    });
+
+    playBtn.addEventListener('click', async () => {
+      await loadImages();
+      enterFullscreen();
+      startSlideshow();
+    });
+  </script>
+</body>
+</html>
