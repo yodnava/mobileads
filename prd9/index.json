@@ -1,5 +1,6 @@
 [
   { "file": "01.jpg", "duration": 3 },
   { "file": "02.jpg", "duration": 3 },
-  { "file": "03.jpg", "duration": 3 }
+  { "file": "03.jpg", "duration": 3 },
+  { "file": "04.jpg", "duration": 3 }
 ]
