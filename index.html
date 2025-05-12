@@ -72,15 +72,6 @@
 </head>
 <body>
   <div id="topbar">
-    <label><input type="checkbox" value="prd1" /> PRD1</label>
-    <label><input type="checkbox" value="prd2" /> PRD2</label>
-    <label><input type="checkbox" value="prd3" /> PRD3</label>
-    <label><input type="checkbox" value="prd4" /> PRD4</label>
-    <label><input type="checkbox" value="prd5" /> PRD5</label>
-    <label><input type="checkbox" value="prd6" /> PRD6</label>
-    <label><input type="checkbox" value="prd7" /> PRD7</label>
-    <label><input type="checkbox" value="prd8" /> PRD8</label>
-    <label><input type="checkbox" value="prd9" /> PRD9</label>
     <button id="playBtn">Play</button>
   </div>
   <div id="default-bg"></div>
@@ -105,25 +96,23 @@
       return res.map(item => ({ ...item, folder }));
     }
 
-    const loadImages = async () => {
-      const selected = ["main"];
-      document.querySelectorAll("input[type=checkbox]:checked").forEach(cb => {
-        selected.push(cb.value);
-      });
+    
+const loadImages = async () => {
+  const config = await fetch("config.json").then(res => res.json()).catch(() => ({ selected: [] }));
+  const selected = config.selected || [];
+  images = [];
+  for (const folder of selected) {
+    const data = await fetchPlaylist(folder);
+    images = images.concat(data);
+  }
+  for (const entry of images) {
+    const img = new Image();
+    img.src = `${entry.folder}/${entry.file}?v=${Date.now()}`;
+    img.classList.add('slide-image');
+    slideshow.appendChild(img);
+  }
+};
 
-      images = [];
-      for (const folder of selected) {
-        const data = await fetchPlaylist(folder);
-        images = images.concat(data);
-      }
-
-      for (const entry of images) {
-        const img = new Image();
-        img.src = `${entry.folder}/${entry.file}?v=${Date.now()}`;
-        img.classList.add('slide-image');
-        slideshow.appendChild(img);
-      }
-    };
 
     const showImage = (index) => {
       [...slideshow.children].forEach((img, i) => {
